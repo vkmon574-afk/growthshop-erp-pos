@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { CAMERA_BG_URL, RECEIPT_THUMB_URL } from '../data/initialData';
+import { CAMERA_BG_URL, RECEIPT_THUMB_URL } from './initialData';
 
 interface ReceiptScannerModalProps {
   onBack: () => void;
