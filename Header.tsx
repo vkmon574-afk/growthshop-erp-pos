@@ -1,5 +1,5 @@
 import React from 'react';
-import { LOGO_URL } from '../data/initialData';
+import { LOGO_URL } from './initialData';
 import { UserRole } from '../types';
 
 interface HeaderProps {
