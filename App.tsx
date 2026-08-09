@@ -15,19 +15,19 @@ import {
   INITIAL_GROCERY_ITEMS,
   INITIAL_TRANSACTIONS,
 } from './initialData';
-import { Header } from './components/Header';
-import { BottomNav } from './components/BottomNav';
-import { AdminDashboardScreen } from './components/AdminDashboardScreen';
-import { PosBillingScreen } from './components/PosBillingScreen';
-import { InventoryScreen } from './components/InventoryScreen';
-import { CustomersScreen } from './components/CustomersScreen';
-import { VatReportScreen } from './components/VatReportScreen';
-import { ReceiptScannerModal } from './components/ReceiptScannerModal';
-import { LedgerScreen } from './components/LedgerScreen';
-import { SettingsScreen } from './components/SettingsScreen';
-import { TaxInvoiceModal } from './components/TaxInvoiceModal';
-import { EmployeesScreen } from './components/EmployeesScreen';
-import { RegisterShiftScreen } from './components/RegisterShiftScreen';
+import { Header } from './Header';
+import { BottomNav } from './BottomNav';
+import { AdminDashboardScreen } from './AdminDashboardScreen';
+import { PosBillingScreen } from './PosBillingScreen';
+import { InventoryScreen } from './InventoryScreen';
+import { CustomersScreen } from './CustomersScreen';
+import { VatReportScreen } from './VatReportScreen';
+import { ReceiptScannerModal } from './ReceiptScannerModal';
+import { LedgerScreen } from './LedgerScreen';
+import { SettingsScreen } from './SettingsScreen';
+import { TaxInvoiceModal } from './TaxInvoiceModal';
+import { EmployeesScreen } from './EmployeesScreen';
+import { RegisterShiftScreen } from './RegisterShiftScreen';
 
 export default function App() {
   // User Role State
