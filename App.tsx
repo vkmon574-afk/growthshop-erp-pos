@@ -14,7 +14,7 @@ import {
   INITIAL_EMPLOYEES,
   INITIAL_GROCERY_ITEMS,
   INITIAL_TRANSACTIONS,
-} from './data/initialData';
+} from './initialData';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { AdminDashboardScreen } from './components/AdminDashboardScreen';
