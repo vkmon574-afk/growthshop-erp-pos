@@ -7,8 +7,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const __dirname = process.cwd();
-const __dirname = process.cwd();
 async function startServer() {
   const app = express();
   const PORT = Number(process.env.PORT) || 3000;
