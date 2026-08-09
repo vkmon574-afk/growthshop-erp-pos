@@ -1,0 +1,6 @@
+{
+  "name": "GrowthShop ERP & POS",
+  "description": "Professional Odoo & Zoho inspired Store ERP, Itemized POS Billing, Customer Khata Management, Grocery Price Catalog, Discounts, and FTA Tax Invoices.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
