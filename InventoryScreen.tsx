@@ -25,7 +25,7 @@ useEffect(() => {
   fetch('/api/products')
     .then(res => res.json())
     .then(data => setProducts(data))
-    .catch(err => console.error('Failed to load products', err));
+    .catch(err => console.error(err));
 }, []);
   // Form state
   const [name, setName] = useState('');
