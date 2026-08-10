@@ -49,22 +49,58 @@ const filteredItems = products.filter((item: any) => {
   return matchesCat && matchesSearch;
 });   
 
-  const handleSaveNewItem = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !price) return;
+  cconst handleSaveNewItem = async (e: React.FormEvent) => {
+  e.preventDefault();
 
+  if (!name.trim() || !price) return;
+
+  const payload = {
+    name,
+    sku: barcode || name.replace(/\s+/g, '-').toUpperCase(),
+    category,
+    cost_price: parseFloat(price) || 0,
+    selling_price: parseFloat(price) || 0,
+    stock_qty: parseInt(stockQty) || 0,
+  };
+
+  try {
     if (editingItem) {
-      onUpdateItem(editingItem.id, {
-        name,
-        nameArabic: nameArabic || undefined,
-        category,
-        price: parseFloat(price) || 0,
-        unit,
-        stockQty: parseInt(stockQty) || 0,
-        barcode: barcode || undefined,
+      const res = await fetch(`/api/products/${editingItem.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
-      setEditingItem(null);
+
+      const updated = await res.json();
+
+      setProducts((prev) =>
+        prev.map((p) => (p.id === updated.id ? updated : p))
+      );
     } else {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const created = await res.json();
+
+      setProducts((prev) => [created, ...prev]);
+    }
+
+    // Reset
+    setName('');
+    setNameArabic('');
+    setCategory('Grocery');
+    setPrice('');
+    setStockQty('');
+    setBarcode('');
+    setShowAddModal(false);
+    setEditingItem(null);
+  } catch (err) {
+    console.error('Failed to save product', err);
+  }
+};
       onAddItem({
         name,
         nameArabic: nameArabic || undefined,
@@ -87,7 +123,7 @@ const filteredItems = products.filter((item: any) => {
     setShowAddModal(false);
   };
 
-  const openEdit = (item: GroceryItem) => {
+  const openEdit = (item: any) => {
     setEditingItem(item);
     setName(item.name);
     setNameArabic(item.nameArabic || '');
@@ -222,7 +258,7 @@ const filteredItems = products.filter((item: any) => {
                 </button>
               ) : (
                 <span className="text-xs text-slate-500 font-medium bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
-                  Stock: {item.stock_qty} {item.unit}
+                  Stock: {item.stock_qty ?? 0} {item.unit || 'pcs'}
                 </span>
               )}
             </div>
