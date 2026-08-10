@@ -419,4 +419,3 @@ const filteredItems = products.filter((item: any) => {
       )}
     </div>
   );
-};
