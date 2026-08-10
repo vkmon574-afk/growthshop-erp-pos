@@ -233,20 +233,30 @@ export default function App() {
   };
 
   // Add grocery item
-  const handleAddGroceryItem = (newItem: Omit<GroceryItem, 'id'>) => {
-    const created: GroceryItem = {
-      ...newItem,
-      id: `item-${Date.now()}`,
-    };
-    setItems((prev) => [created, ...prev]);
-    showToast(`Added item "${created.name}"`);
-  };
+ const handleAddGroceryItem = async (newItem: Omit<GroceryItem, 'id'>) => {
+  try {
+    const response = await fetch('/api/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newItem),
+    });
 
-  // Update grocery item
-  const handleUpdateGroceryItem = (id: string, updated: Partial<GroceryItem>) => {
-    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...updated } : item)));
-    showToast('Item updated');
-  };
+    if (!response.ok) {
+      throw new Error('Failed to save product');
+    }
+
+    const savedProduct = await response.json();
+
+    setItems((prev) => [savedProduct, ...prev]);
+
+    showToast(`Added item "${savedProduct.name}"`);
+  } catch (error) {
+    console.error(error);
+    showToast('Failed to save product');
+  }
+};
 
   // Add Employee
   const handleAddEmployee = (
