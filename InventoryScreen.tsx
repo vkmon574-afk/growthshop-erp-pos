@@ -122,17 +122,17 @@ const filteredItems = products.filter((item: any) => {
     setBarcode('');
     setShowAddModal(false);
 
-  const openEdit = (item: any) => {
-    setEditingItem(item);
-    setName(item.name);
-    setNameArabic(item.nameArabic || '');
-    setCategory(item.category as SaleCategory);
-    setPrice(item.selling_price.toString());
-    setUnit(item.unit);
-    setStockQty(item.stock_qty.toString());
-    setBarcode(item.barcode || '');
-    setShowAddModal(true);
-  };
+  cconst openEdit = (item: any) => {
+  setEditingItem(item);
+  setName(item.name);
+  setNameArabic(item.nameArabic || '');
+  setCategory(item.category as SaleCategory);
+  setPrice(String(item.selling_price ?? 0));
+  setUnit(item.unit || 'pcs');
+  setStockQty(String(item.stock_qty ?? 0));
+  setBarcode(item.barcode || '');
+  setShowAddModal(true);
+};
   return (
     <div className="flex flex-col w-full max-w-lg mx-auto px-container-margin pt-stack-md pb-28 animate-fadeIn gap-section-gap">
       {/* Header Banner */}
