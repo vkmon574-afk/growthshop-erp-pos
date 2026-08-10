@@ -92,9 +92,9 @@ const filteredItems = products.filter((item: any) => {
     setName(item.name);
     setNameArabic(item.nameArabic || '');
     setCategory(item.category as SaleCategory);
-    setPrice(item.price.toString());
+    setPrice(item.selling_price.toString());
     setUnit(item.unit);
-    setStockQty(item.stockQty.toString());
+    setStockQty(item.stock_qty.toString())
     setBarcode(item.barcode || '');
     setShowAddModal(true);
   };
@@ -208,7 +208,7 @@ const filteredItems = products.filter((item: any) => {
                   Unit Price
                 </span>
                 <span className="font-bold text-emerald-700 text-base">
-                  AED {item.price.toFixed(2)}
+                  AED {item.selling_price.toFixed(2)}
                 </span>
               </div>
 
