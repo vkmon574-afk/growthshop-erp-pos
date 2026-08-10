@@ -33,6 +33,36 @@ async function startServer() {
     res.json({ status: 'ok' });
   });
 
+  // Get all products
+app.get('/api/products', async (_req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM products ORDER BY id DESC');
+    res.json(result.rows);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Add product
+app.post('/api/products', async (req, res) => {
+  try {
+    const { name, sku, category, cost_price, selling_price, stock_qty } = req.body;
+
+    const result = await pool.query(
+      `INSERT INTO products
+      (name, sku, category, cost_price, selling_price, stock_qty)
+      VALUES ($1,$2,$3,$4,$5,$6)
+      RETURNING *`,
+      [name, sku, category, cost_price, selling_price, stock_qty]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
   // Receipt OCR / AI Scanner route
   app.post('/api/scan-receipt', async (req, res) => {
     try {
