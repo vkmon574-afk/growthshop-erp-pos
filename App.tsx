@@ -237,9 +237,7 @@ const handleAddGroceryItem = async (newItem: Omit<GroceryItem, 'id'>) => {
   try {
     const response = await fetch('/api/products', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: newItem.name,
         sku: newItem.barcode || `SKU-${Date.now()}`,
@@ -254,16 +252,6 @@ const handleAddGroceryItem = async (newItem: Omit<GroceryItem, 'id'>) => {
       throw new Error('Failed to save product');
     }
 
-    const savedProduct = await response.json();
-
-    setItems((prev) => [savedProduct, ...prev]);
-
-    showToast(`Added item "${savedProduct.name}"`);
-  } catch (error) {
-    console.error(error);
-    showToast('Failed to save product');
-  }
-};
     const savedProduct = await response.json();
 
     setItems((prev) => [savedProduct, ...prev]);
