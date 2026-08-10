@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import React, { useState } from 'react';
 import { GroceryItem, SaleCategory } from '../types';
 
@@ -18,7 +19,14 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<GroceryItem | null>(null);
+const [products, setProducts] = useState<any[]>([]);
 
+useEffect(() => {
+  fetch('/api/products')
+    .then(res => res.json())
+    .then(data => setProducts(data))
+    .catch(err => console.error('Failed to load products', err));
+}, []);
   // Form state
   const [name, setName] = useState('');
   const [nameArabic, setNameArabic] = useState('');
@@ -30,14 +38,16 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
 
   const categories = ['All', 'Grocery', 'Dairy & Fresh', 'Beverages', 'Snacks & Sweets', 'Household', 'Personal Care'];
 
-  const filteredItems = items.filter((item) => {
-    const matchesCat = selectedCategory === 'All' || item.category === selectedCategory;
-    const matchesSearch =
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.nameArabic && item.nameArabic.includes(searchQuery)) ||
-      (item.barcode && item.barcode.includes(searchQuery));
-    return matchesCat && matchesSearch;
-  });
+const filteredItems = products.filter((item: any) => {
+  const matchesCat =
+    selectedCategory === 'All' || item.category === selectedCategory;
+
+  const matchesSearch =
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (item.barcode && item.barcode.includes(searchQuery));
+
+  return matchesCat && matchesSearch;
+});   
 
   const handleSaveNewItem = (e: React.FormEvent) => {
     e.preventDefault();
