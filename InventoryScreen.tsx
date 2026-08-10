@@ -122,7 +122,7 @@ const filteredItems = products.filter((item: any) => {
     setBarcode('');
     setShowAddModal(false);
 
-  cconst openEdit = (item: any) => {
+  const openEdit = (item: any) => {
   setEditingItem(item);
   setName(item.name);
   setNameArabic(item.nameArabic || '');
