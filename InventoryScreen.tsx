@@ -108,7 +108,7 @@ const filteredItems = products.filter((item: any) => {
             Store Items & Prices
           </span>
           <div className="font-display-sm text-on-surface font-bold mt-0.5">
-            {items.length} Products
+            {filteredItems.length} Products
           </div>
           <span className="font-label-sm text-on-surface-variant text-xs">
             Standard 5% UAE VAT applicable
