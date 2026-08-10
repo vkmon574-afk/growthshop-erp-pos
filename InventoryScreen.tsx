@@ -49,7 +49,7 @@ const filteredItems = products.filter((item: any) => {
   return matchesCat && matchesSearch;
 });   
 
-  cconst handleSaveNewItem = async (e: React.FormEvent) => {
+  const handleSaveNewItem = async (e: React.FormEvent) => {
   e.preventDefault();
 
   if (!name.trim() || !price) return;
