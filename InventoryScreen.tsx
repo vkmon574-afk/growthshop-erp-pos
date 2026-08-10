@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GroceryItem, SaleCategory } from '../types';
 
 interface InventoryScreenProps {
@@ -101,27 +100,6 @@ const filteredItems = products.filter((item: any) => {
     console.error('Failed to save product', err);
   }
 };
-      onAddItem({
-        name,
-        nameArabic: nameArabic || undefined,
-        category,
-        price: parseFloat(price) || 0,
-        unit,
-        stockQty: parseInt(stockQty) || 0,
-        barcode: barcode || undefined,
-        icon: 'storefront',
-      });
-    }
-
-    // Reset
-    setName('');
-    setNameArabic('');
-    setCategory('Grocery');
-    setPrice('');
-    setStockQty('');
-    setBarcode('');
-    setShowAddModal(false);
-
   const openEdit = (item: any) => {
   setEditingItem(item);
   setName(item.name);
