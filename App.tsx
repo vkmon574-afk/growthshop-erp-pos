@@ -240,7 +240,7 @@ export default function App() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(newItem),
+      body: JSON.stringify({ name: newItem.name, sku: newItem.barcode || `SKU-${Date.now()}`, category: newItem.category, cost_price: 0, selling_price: Number(newItem.price || 0), stock_qty: Number(newItem.stockQty || 0) }),
     });
 
     if (!response.ok) {
