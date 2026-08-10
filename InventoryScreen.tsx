@@ -132,7 +132,7 @@ const filteredItems = products.filter((item: any) => {
     setStockQty(item.stock_qty.toString())
     setBarcode(item.barcode || '');
     setShowAddModal(true);
-  };
+  }
 
   return (
     <div className="flex flex-col w-full max-w-lg mx-auto px-container-margin pt-stack-md pb-28 animate-fadeIn gap-section-gap">
