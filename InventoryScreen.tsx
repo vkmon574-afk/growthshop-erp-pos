@@ -208,7 +208,7 @@ const filteredItems = products.filter((item: any) => {
                   Unit Price
                 </span>
                 <span className="font-bold text-emerald-700 text-base">
-                  AED {item.selling_price.toFixed(2)}
+                  AED {Number(item.selling_price).toFixed(2)}
                 </span>
               </div>
 
@@ -222,7 +222,7 @@ const filteredItems = products.filter((item: any) => {
                 </button>
               ) : (
                 <span className="text-xs text-slate-500 font-medium bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
-                  Stock: {item.stockQty} {item.unit}
+                  Stock: {item.stock_qty} {item.unit}
                 </span>
               )}
             </div>
