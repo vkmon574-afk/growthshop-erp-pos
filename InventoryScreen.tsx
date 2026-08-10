@@ -121,7 +121,6 @@ const filteredItems = products.filter((item: any) => {
     setStockQty('');
     setBarcode('');
     setShowAddModal(false);
-  };
 
   const openEdit = (item: any) => {
     setEditingItem(item);
