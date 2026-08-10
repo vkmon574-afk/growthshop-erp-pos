@@ -233,19 +233,7 @@ export default function App() {
   };
 
   // Add grocery item
- const handleAddGroceryItem = async (newItem: Omit<GroceryItem, 'id'>) => {
-  try {
-    const response = await fetch('/api/products', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name: newItem.name, sku: newItem.barcode || `SKU-${Date.now()}`, category: newItem.category, cost_price: 0, selling_price: Number(newItem.price || 0), stock_qty: Number(newItem.stockQty || 0) }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to save product');
-    }
+ const handleAddGroceryItem = async (newItem: Omit<GroceryItem, 'id'>) => { try { const response = await fetch('/api/products', { method: 'POST', headers: { 'Content-Type': 'application/json', }, body: JSON.stringify({ name: newItem.name, sku: newItem.barcode || `SKU-${Date.now()}`, category: newItem.category, cost_price: 0, selling_price: Number(newItem.price || 0), stock_qty: Number(newItem.stockQty || 0) }), }); if (!response.ok) { throw new Error('Failed to save product'); } const savedProduct = await response.json(); setItems((prev) => [savedProduct, ...prev]); showToast(`Added item "${savedProduct.name}"`); } catch (error) { console.error(error); showToast('Failed to save product'); } };
 
     const savedProduct = await response.json();
 
