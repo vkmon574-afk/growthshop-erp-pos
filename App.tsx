@@ -542,7 +542,7 @@ export default function App() {
         />
       )}
 
-      {/* Role Switcher Modal (Admin vs. Employee Cashier) */}
+      {/* Role Switcher Modal */}
       {showRoleModal && (
         <div className="fixed inset-0 z-[120] bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-slideUp space-y-5">
@@ -566,9 +566,7 @@ export default function App() {
               </button>
             </div>
 
-            {/* Role Options */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Admin Mode Card */}
               <button
                 onClick={() => {
                   setActiveRole('admin');
@@ -593,7 +591,6 @@ export default function App() {
                 </p>
               </button>
 
-              {/* Employee Mode Card */}
               <button
                 onClick={() => {
                   setActiveRole('employee');
@@ -617,7 +614,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* Select Active Cashier Staff */}
             <div className="space-y-2 pt-2 border-t border-slate-100">
               <label className="block text-xs font-bold text-slate-700">
                 Select Active Cashier Profile:
