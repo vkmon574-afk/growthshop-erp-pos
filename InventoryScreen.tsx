@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { GroceryItem, SaleCategory } from '../types';
+import { GroceryItem, SaleCategory } from './types';
 
 interface InventoryScreenProps {
-  items: GroceryItem[];
-  onAddItem: (item: Omit<GroceryItem, 'id'>) => void;
-  onUpdateItem: (id: string, updated: Partial<GroceryItem>) => void;
+  items?: GroceryItem[];
+  onAddItem?: (item: Omit<GroceryItem, 'id'>) => void;
+  onUpdateItem?: (id: string, updated: Partial<GroceryItem>) => void;
   onAddToCart?: (item: GroceryItem) => void;
 }
 
@@ -19,7 +19,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<GroceryItem | null>(null);
 
-  // Form state
+  // Form State
   const [name, setName] = useState('');
   const [nameArabic, setNameArabic] = useState('');
   const [category, setCategory] = useState<SaleCategory>('Grocery');
@@ -38,7 +38,9 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
     'Personal Care',
   ];
 
-  const filteredItems = items.filter((item) => {
+  const safeItems = Array.isArray(items) ? items : [];
+
+  const filteredItems = safeItems.filter((item) => {
     if (!item) return false;
     const matchesCat =
       selectedCategory === 'All' || item.category === selectedCategory;
@@ -56,7 +58,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
     e.preventDefault();
     if (!name.trim() || !price) return;
 
-    if (editingItem) {
+    if (editingItem && onUpdateItem) {
       onUpdateItem(editingItem.id, {
         name,
         nameArabic: nameArabic || undefined,
@@ -66,8 +68,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
         stockQty: parseInt(stockQty) || 0,
         barcode: barcode || undefined,
       });
-      setEditingItem(null);
-    } else {
+    } else if (onAddItem) {
       onAddItem({
         name,
         nameArabic: nameArabic || undefined,
@@ -89,6 +90,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
     setStockQty('');
     setBarcode('');
     setShowAddModal(false);
+    setEditingItem(null);
   };
 
   const openEdit = (item: GroceryItem) => {
@@ -96,25 +98,25 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
     setName(item.name || '');
     setNameArabic(item.nameArabic || '');
     setCategory((item.category as SaleCategory) || 'Grocery');
-    setPrice(item.price ? item.price.toString() : '0');
+    setPrice(item.price !== undefined ? item.price.toString() : '0');
     setUnit(item.unit || 'pcs');
-    setStockQty(item.stockQty ? item.stockQty.toString() : '0');
+    setStockQty(item.stockQty !== undefined ? item.stockQty.toString() : '0');
     setBarcode(item.barcode || '');
     setShowAddModal(true);
   };
 
   return (
-    <div className="flex flex-col w-full max-w-lg mx-auto px-container-margin pt-stack-md pb-28 animate-fadeIn gap-section-gap">
-      {/* Header Banner */}
-      <div className="bg-surface-container-lowest rounded-2xl p-card-padding shadow-[0_4px_20px_rgba(15,23,42,0.05)] border border-outline-variant/30 flex items-center justify-between">
+    <div className="flex flex-col w-full max-w-lg mx-auto px-4 pt-4 pb-28 animate-fadeIn gap-4">
+      {/* Top Banner */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex items-center justify-between">
         <div>
-          <span className="font-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">
             Store Items & Prices
           </span>
-          <div className="font-display-sm text-on-surface font-bold mt-0.5">
+          <div className="text-xl text-slate-900 font-bold mt-0.5">
             {filteredItems.length} Products
           </div>
-          <span className="font-label-sm text-on-surface-variant text-xs">
+          <span className="text-xs text-slate-400">
             Standard 5% UAE VAT applicable
           </span>
         </div>
@@ -131,7 +133,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
             setBarcode('');
             setShowAddModal(true);
           }}
-          className="bg-primary text-on-primary p-3 rounded-xl shadow-md flex items-center gap-1.5 font-label-md font-semibold active:scale-95 transition-transform cursor-pointer"
+          className="bg-emerald-700 text-white p-3 rounded-xl shadow-md flex items-center gap-1.5 font-semibold text-xs active:scale-95 transition-transform cursor-pointer"
         >
           <span className="material-symbols-outlined text-[20px]">add_box</span>
           Add Product
@@ -140,7 +142,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
 
       {/* Search Input */}
       <div className="relative">
-        <span className="material-symbols-outlined absolute left-3.5 top-3 text-on-surface-variant text-[20px]">
+        <span className="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-[20px]">
           search
         </span>
         <input
@@ -148,11 +150,11 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search product, Arabic name, or scan barcode..."
-          className="w-full pl-11 pr-4 py-2.5 bg-surface-container rounded-xl text-sm outline-none border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest transition-all"
+          className="w-full pl-11 pr-4 py-2.5 bg-slate-100 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 focus:bg-white transition-all"
         />
       </div>
 
-      {/* Category Filter Chips */}
+      {/* Category Chips */}
       <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
         {categories.map((cat) => (
           <button
@@ -160,8 +162,8 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
             onClick={() => setSelectedCategory(cat)}
             className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
               selectedCategory === cat
-                ? 'bg-primary text-on-primary shadow-xs'
-                : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                ? 'bg-emerald-700 text-white shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             {cat}
@@ -169,7 +171,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
         ))}
       </div>
 
-      {/* Items List */}
+      {/* Product List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {filteredItems.length === 0 ? (
           <div className="col-span-full text-center py-12 bg-white rounded-2xl border border-slate-200 p-6">
@@ -178,14 +180,14 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
             </span>
             <p className="font-bold text-slate-800 text-sm">No items found</p>
             <p className="text-xs text-slate-500 mt-1">
-              Try changing the search or category filter.
+              Add a new product or change search terms.
             </p>
           </div>
         ) : (
           filteredItems.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/90 flex flex-col justify-between gap-3 hover:border-emerald-600/50 transition-all"
+              className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200 flex flex-col justify-between gap-3 hover:border-emerald-600/50 transition-all"
             >
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-2.5">
@@ -212,7 +214,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
                 <button
                   onClick={() => openEdit(item)}
                   className="text-slate-400 hover:text-emerald-700 p-1 transition-colors cursor-pointer"
-                  title="Edit Price/Stock"
+                  title="Edit Product"
                 >
                   <span className="material-symbols-outlined text-[18px]">
                     edit
@@ -251,7 +253,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
         )}
       </div>
 
-      {/* Add / Edit Product Modal */}
+      {/* Add / Edit Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
           <div
@@ -291,20 +293,20 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Al Rawabi Fresh Milk 2L"
-                  className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 focus:bg-white text-slate-900"
+                  className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 text-slate-900"
                 />
               </div>
 
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-bold text-slate-700">
-                  Arabic Name (For Tax Invoice)
+                  Arabic Name
                 </label>
                 <input
                   type="text"
                   value={nameArabic}
                   onChange={(e) => setNameArabic(e.target.value)}
                   placeholder="حليب المراعي"
-                  className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 focus:bg-white text-slate-900"
+                  className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 text-slate-900"
                 />
               </div>
 
@@ -320,7 +322,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="11.00"
-                    className="p-3 bg-slate-50 rounded-xl text-sm font-bold text-emerald-700 outline-none border border-slate-200 focus:border-emerald-600 focus:bg-white"
+                    className="p-3 bg-slate-50 rounded-xl text-sm font-bold text-emerald-700 outline-none border border-slate-200 focus:border-emerald-600"
                   />
                 </div>
 
@@ -333,10 +335,10 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
                     onChange={(e) =>
                       setUnit(e.target.value as GroceryItem['unit'])
                     }
-                    className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 focus:bg-white text-slate-900"
+                    className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 text-slate-900"
                   >
-                    <option value="pcs">pcs (Pieces)</option>
-                    <option value="kg">kg (Kilograms)</option>
+                    <option value="pcs">pcs</option>
+                    <option value="kg">kg</option>
                     <option value="liter">liter</option>
                     <option value="pack">pack</option>
                     <option value="box">box</option>
@@ -355,7 +357,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
                     onChange={(e) =>
                       setCategory(e.target.value as SaleCategory)
                     }
-                    className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 focus:bg-white text-slate-900"
+                    className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 text-slate-900"
                   >
                     <option value="Grocery">Grocery</option>
                     <option value="Dairy & Fresh">Dairy & Fresh</option>
@@ -375,7 +377,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
                     value={stockQty}
                     onChange={(e) => setStockQty(e.target.value)}
                     placeholder="20"
-                    className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 focus:bg-white text-slate-900"
+                    className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 text-slate-900"
                   />
                 </div>
               </div>
@@ -389,7 +391,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
                   value={barcode}
                   onChange={(e) => setBarcode(e.target.value)}
                   placeholder="e.g. 629100100201"
-                  className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 focus:bg-white font-mono text-xs text-slate-900"
+                  className="p-3 bg-slate-50 rounded-xl text-sm outline-none border border-slate-200 focus:border-emerald-600 font-mono text-xs text-slate-900"
                 />
               </div>
             </div>
@@ -398,13 +400,13 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-sm transition-colors cursor-pointer"
+                className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 font-bold text-sm shadow-md transition-colors cursor-pointer"
+                className="flex-1 py-3 rounded-xl bg-emerald-700 text-white font-bold text-sm hover:bg-emerald-800 shadow-md cursor-pointer"
               >
                 Save Product
               </button>
