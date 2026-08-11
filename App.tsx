@@ -572,7 +572,7 @@ export default function App() {
                   setActiveRole('admin');
                   setActiveTab('admin-dashboard');
                   setShowRoleModal(false);
-                  showToast('Switched to Executive Admin Mode 🛡️');
+                  showToast('Switched to Executive Admin Mode');
                 }}
                 className={`p-4 rounded-2xl border text-left transition-all relative ${
                   activeRole === 'admin'
@@ -585,7 +585,7 @@ export default function App() {
                     admin_panel_settings
                   </span>
                 </div>
-                <div className="font-bold text-slate-900 text-sm">🛡️ Admin Dashboard</div>
+                <div className="font-bold text-slate-900 text-sm">Admin Dashboard</div>
                 <p className="text-[11px] text-slate-600 mt-1 leading-snug">
                   Full control: Net Profit (Green), Expenses (Red), FTA VAT thresholds, Stock Prices & Staff Roster.
                 </p>
@@ -596,7 +596,7 @@ export default function App() {
                   setActiveRole('employee');
                   setActiveTab('pos');
                   setShowRoleModal(false);
-                  showToast('Switched to Cashier POS Mode 🛒');
+                  showToast('Switched to Cashier POS Mode');
                 }}
                 className={`p-4 rounded-2xl border text-left transition-all relative ${
                   activeRole === 'employee'
@@ -607,7 +607,7 @@ export default function App() {
                 <div className="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center mb-3 shadow-xs">
                   <span className="material-symbols-outlined text-[22px]">point_of_sale</span>
                 </div>
-                <div className="font-bold text-slate-900 text-sm">🛒 Cashier / Employee View</div>
+                <div className="font-bold text-slate-900 text-sm">Cashier / Employee View</div>
                 <p className="text-[11px] text-slate-600 mt-1 leading-snug">
                   High-speed POS billing, customer Udhar lookup, price catalog & cash drawer shift without owner metrics.
                 </p>
