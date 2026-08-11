@@ -2,30 +2,28 @@ import React, { useEffect, useState } from 'react';
 import { GroceryItem, SaleCategory } from '../types';
 
 interface InventoryScreenProps {
-  items: GroceryItem[];
-  onAddItem: (item: Omit<GroceryItem, 'id'>) => void;
-  onUpdateItem: (id: string, updated: Partial<GroceryItem>) => void;
+  items?: GroceryItem[];
+  onAddItem?: (item: Omit<GroceryItem, 'id'>) => void;
+  onUpdateItem?: (id: string, updated: Partial<GroceryItem>) => void;
   onAddToCart?: (item: GroceryItem) => void;
 }
 
 export const InventoryScreen: React.FC<InventoryScreenProps> = ({
-  items,
-  onAddItem,
-  onUpdateItem,
   onAddToCart,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingItem, setEditingItem] = useState<GroceryItem | null>(null);
-const [products, setProducts] = useState<any[]>([]);
+  const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [products, setProducts] = useState<any[]>([]);
 
-useEffect(() => {
-  fetch('/api/products')
-    .then(res => res.json())
-    .then(data => setProducts(data))
-    .catch(err => console.error(err));
-}, []);
+  useEffect(() => {
+    fetch('/api/products')
+      .then((res) => res.json())
+      .then((data) => setProducts(data))
+      .catch((err) => console.error(err));
+  }, []);
+
   // Form state
   const [name, setName] = useState('');
   const [nameArabic, setNameArabic] = useState('');
@@ -35,82 +33,97 @@ useEffect(() => {
   const [stockQty, setStockQty] = useState('');
   const [barcode, setBarcode] = useState('');
 
-  const categories = ['All', 'Grocery', 'Dairy & Fresh', 'Beverages', 'Snacks & Sweets', 'Household', 'Personal Care'];
+  const categories = [
+    'All',
+    'Grocery',
+    'Dairy & Fresh',
+    'Beverages',
+    'Snacks & Sweets',
+    'Household',
+    'Personal Care',
+  ];
 
-const filteredItems = products.filter((item: any) => {
-  const matchesCat =
-    selectedCategory === 'All' || item.category === selectedCategory;
+  const filteredItems = products.filter((item: any) => {
+    const matchesCat =
+      selectedCategory === 'All' || item.category === selectedCategory;
 
-  const matchesSearch =
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (item.barcode && item.barcode.includes(searchQuery));
+    const query = searchQuery.toLowerCase();
+    const matchesSearch =
+      (item.name && item.name.toLowerCase().includes(query)) ||
+      (item.nameArabic && item.nameArabic.toLowerCase().includes(query)) ||
+      (item.barcode && item.barcode.includes(query));
 
-  return matchesCat && matchesSearch;
-});   
+    return matchesCat && matchesSearch;
+  });
 
   const handleSaveNewItem = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!name.trim() || !price) return;
+    if (!name.trim() || !price) return;
 
-  const payload = {
-    name,
-    sku: barcode || name.replace(/\s+/g, '-').toUpperCase(),
-    category,
-    cost_price: parseFloat(price) || 0,
-    selling_price: parseFloat(price) || 0,
-    stock_qty: parseInt(stockQty) || 0,
+    const payload = {
+      name,
+      nameArabic,
+      unit,
+      category,
+      cost_price: parseFloat(price) || 0,
+      selling_price: parseFloat(price) || 0,
+      stock_qty: parseInt(stockQty) || 0,
+      barcode: barcode || name.replace(/\s+/g, '-').toUpperCase(),
+    };
+
+    try {
+      if (editingItem) {
+        const res = await fetch(`/api/products/${editingItem.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const updated = await res.json();
+
+        setProducts((prev) =>
+          prev.map((p) => (p.id === updated.id ? updated : p))
+        );
+      } else {
+        const res = await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const created = await res.json();
+
+        setProducts((prev) => [created, ...prev]);
+      }
+
+      // Reset
+      setName('');
+      setNameArabic('');
+      setCategory('Grocery');
+      setPrice('');
+      setUnit('pcs');
+      setStockQty('');
+      setBarcode('');
+      setShowAddModal(false);
+      setEditingItem(null);
+    } catch (err) {
+      console.error('Failed to save product', err);
+    }
   };
 
-  try {
-    if (editingItem) {
-      const res = await fetch(`/api/products/${editingItem.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const updated = await res.json();
-
-      setProducts((prev) =>
-        prev.map((p) => (p.id === updated.id ? updated : p))
-      );
-    } else {
-      const res = await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const created = await res.json();
-
-      setProducts((prev) => [created, ...prev]);
-    }
-
-    // Reset
-    setName('');
-    setNameArabic('');
-    setCategory('Grocery');
-    setPrice('');
-    setStockQty('');
-    setBarcode('');
-    setShowAddModal(false);
-    setEditingItem(null);
-  } catch (err) {
-    console.error('Failed to save product', err);
-  }
-};
   const openEdit = (item: any) => {
-  setEditingItem(item);
-  setName(item.name);
-  setNameArabic(item.nameArabic || '');
-  setCategory(item.category as SaleCategory);
-  setPrice(String(item.selling_price ?? 0));
-  setUnit(item.unit || 'pcs');
-  setStockQty(String(item.stock_qty ?? 0));
-  setBarcode(item.barcode || '');
-  setShowAddModal(true);
-};
+    setEditingItem(item);
+    setName(item.name || '');
+    setNameArabic(item.nameArabic || '');
+    setCategory((item.category as SaleCategory) || 'Grocery');
+    setPrice(String(item.selling_price ?? 0));
+    setUnit(item.unit || 'pcs');
+    setStockQty(String(item.stock_qty ?? 0));
+    setBarcode(item.barcode || '');
+    setShowAddModal(true);
+  };
+
   return (
     <div className="flex flex-col w-full max-w-lg mx-auto px-container-margin pt-stack-md pb-28 animate-fadeIn gap-section-gap">
       {/* Header Banner */}
@@ -134,6 +147,7 @@ const filteredItems = products.filter((item: any) => {
             setNameArabic('');
             setCategory('Grocery');
             setPrice('');
+            setUnit('pcs');
             setStockQty('');
             setBarcode('');
             setShowAddModal(true);
@@ -200,7 +214,7 @@ const filteredItems = products.filter((item: any) => {
                     </span>
                   )}
                   <span className="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full inline-block mt-1 font-medium">
-                    {item.category} • {item.unit}
+                    {item.category} • {item.unit || 'pcs'}
                   </span>
                 </div>
               </div>
@@ -210,7 +224,9 @@ const filteredItems = products.filter((item: any) => {
                 className="text-slate-400 hover:text-emerald-700 p-1 transition-colors"
                 title="Edit Price/Stock"
               >
-                <span className="material-symbols-outlined text-[18px]">edit</span>
+                <span className="material-symbols-outlined text-[18px]">
+                  edit
+                </span>
               </button>
             </div>
 
@@ -220,7 +236,7 @@ const filteredItems = products.filter((item: any) => {
                   Unit Price
                 </span>
                 <span className="font-bold text-emerald-700 text-base">
-                  AED {Number(item.selling_price).toFixed(2)}
+                  AED {Number(item.selling_price || 0).toFixed(2)}
                 </span>
               </div>
 
@@ -229,7 +245,9 @@ const filteredItems = products.filter((item: any) => {
                   onClick={() => onAddToCart(item)}
                   className="bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-xs flex items-center gap-1 active:scale-95 transition-transform"
                 >
-                  <span className="material-symbols-outlined text-[16px]">add_shopping_cart</span>
+                  <span className="material-symbols-outlined text-[16px]">
+                    add_shopping_cart
+                  </span>
                   + Add to Bill
                 </button>
               ) : (
@@ -243,4 +261,153 @@ const filteredItems = products.filter((item: any) => {
       </div>
 
       {/* Add / Edit Product Modal */}
-      {showAddModal && ( <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/50"> <form onSubmit={handleSaveNewItem} className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 flex flex-col gap-4" > <h3 className="font-bold text-lg text-slate-900"> {editingItem ? 'Edit Product' : 'Add Product'} </h3> <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Product name" className="p-3 border rounded-xl" required /> <input type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" className="p-3 border rounded-xl" required /> <input type="number" value={stockQty} onChange={(e) => setStockQty(e.target.value)} placeholder="Stock quantity" className="p-3 border rounded-xl" /> <select value={category} onChange={(e) => setCategory(e.target.value as SaleCategory)} className="p-3 border rounded-xl" > <option value="Grocery">Grocery</option> <option value="Dairy & Fresh">Dairy & Fresh</option> <option value="Beverages">Beverages</option> <option value="Snacks & Sweets">Snacks & Sweets</option> </select> <div className="flex gap-2 pt-2"> <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-bold" > Cancel </button> <button type="submit" className="flex-1 py-3 rounded-xl bg-emerald-700 text-white font-bold" > Save </button> </div> </form> </div> )}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl border border-slate-100 animate-fadeIn">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-lg text-slate-900">
+                {editingItem ? 'Edit Product' : 'Add New Product'}
+              </h3>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="text-slate-400 hover:text-slate-600 p-1"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveNewItem} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Product Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Almarai Milk 1L"
+                  className="w-full px-3 py-2 bg-slate-50 rounded-xl text-sm border border-slate-200 outline-none focus:border-emerald-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Arabic Name
+                </label>
+                <input
+                  type="text"
+                  value={nameArabic}
+                  onChange={(e) => setNameArabic(e.target.value)}
+                  placeholder="e.g. حليب المراعي"
+                  className="w-full px-3 py-2 bg-slate-50 rounded-xl text-sm border border-slate-200 outline-none focus:border-emerald-600"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    Category
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) =>
+                      setCategory(e.target.value as SaleCategory)
+                    }
+                    className="w-full px-3 py-2 bg-slate-50 rounded-xl text-sm border border-slate-200 outline-none focus:border-emerald-600"
+                  >
+                    {categories
+                      .filter((c) => c !== 'All')
+                      .map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    Unit
+                  </label>
+                  <select
+                    value={unit}
+                    onChange={(e) =>
+                      setUnit(e.target.value as GroceryItem['unit'])
+                    }
+                    className="w-full px-3 py-2 bg-slate-50 rounded-xl text-sm border border-slate-200 outline-none focus:border-emerald-600"
+                  >
+                    <option value="pcs">pcs</option>
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="ltr">ltr</option>
+                    <option value="pack">pack</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    Price (AED) *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="0.00"
+                    className="w-full px-3 py-2 bg-slate-50 rounded-xl text-sm border border-slate-200 outline-none focus:border-emerald-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    Stock Quantity
+                  </label>
+                  <input
+                    type="number"
+                    value={stockQty}
+                    onChange={(e) => setStockQty(e.target.value)}
+                    placeholder="0"
+                    className="w-full px-3 py-2 bg-slate-50 rounded-xl text-sm border border-slate-200 outline-none focus:border-emerald-600"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Barcode / SKU
+                </label>
+                <input
+                  type="text"
+                  value={barcode}
+                  onChange={(e) => setBarcode(e.target.value)}
+                  placeholder="Scan or enter barcode"
+                  className="w-full px-3 py-2 bg-slate-50 rounded-xl text-sm border border-slate-200 outline-none focus:border-emerald-600"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 font-semibold text-slate-600 text-sm hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-700 font-semibold text-white text-sm shadow-xs hover:bg-emerald-800"
+                >
+                  {editingItem ? 'Update' : 'Save'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
