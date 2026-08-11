@@ -9,7 +9,7 @@ interface InventoryScreenProps {
 }
 
 export const InventoryScreen: React.FC<InventoryScreenProps> = ({
-  items,
+  items = [],
   onAddItem,
   onUpdateItem,
   onAddToCart,
@@ -38,7 +38,8 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
     'Personal Care',
   ];
 
-  const filteredItems = (items || []).filter((item) => {
+  const filteredItems = items.filter((item) => {
+    if (!item) return false;
     const matchesCat =
       selectedCategory === 'All' || item.category === selectedCategory;
 
@@ -79,7 +80,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
       });
     }
 
-    // Reset
+    // Reset Form
     setName('');
     setNameArabic('');
     setCategory('Grocery');
@@ -130,7 +131,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
             setBarcode('');
             setShowAddModal(true);
           }}
-          className="bg-primary text-on-primary p-3 rounded-xl shadow-md flex items-center gap-1.5 font-label-md font-semibold active:scale-95 transition-transform"
+          className="bg-primary text-on-primary p-3 rounded-xl shadow-md flex items-center gap-1.5 font-label-md font-semibold active:scale-95 transition-transform cursor-pointer"
         >
           <span className="material-symbols-outlined text-[20px]">add_box</span>
           Add Product
@@ -157,7 +158,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
               selectedCategory === cat
                 ? 'bg-primary text-on-primary shadow-xs'
                 : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
@@ -170,72 +171,84 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
 
       {/* Items List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {filteredItems.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/90 flex flex-col justify-between gap-3 hover:border-emerald-600/50 transition-all"
-          >
-            <div className="flex justify-between items-start">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-100">
-                  <span className="material-symbols-outlined text-[22px]">
-                    {item.icon || 'shopping_bag'}
-                  </span>
-                </div>
-                <div>
-                  <h4 className="font-bold text-slate-900 text-sm leading-snug">
-                    {item.name}
-                  </h4>
-                  {item.nameArabic && (
-                    <span className="text-xs text-slate-500 block font-medium">
-                      {item.nameArabic}
-                    </span>
-                  )}
-                  <span className="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full inline-block mt-1 font-medium">
-                    {item.category} • {item.unit || 'pcs'}
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => openEdit(item)}
-                className="text-slate-400 hover:text-emerald-700 p-1 transition-colors"
-                title="Edit Price/Stock"
-              >
-                <span className="material-symbols-outlined text-[18px]">
-                  edit
-                </span>
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-              <div>
-                <span className="text-[10px] text-slate-400 block uppercase font-bold">
-                  Unit Price
-                </span>
-                <span className="font-bold text-emerald-700 text-base">
-                  AED {Number(item.price || 0).toFixed(2)}
-                </span>
-              </div>
-
-              {onAddToCart ? (
-                <button
-                  onClick={() => onAddToCart(item)}
-                  className="bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-xs flex items-center gap-1 active:scale-95 transition-transform"
-                >
-                  <span className="material-symbols-outlined text-[16px]">
-                    add_shopping_cart
-                  </span>
-                  + Add to Bill
-                </button>
-              ) : (
-                <span className="text-xs text-slate-500 font-medium bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
-                  Stock: {item.stockQty ?? 0} {item.unit || 'pcs'}
-                </span>
-              )}
-            </div>
+        {filteredItems.length === 0 ? (
+          <div className="col-span-full text-center py-12 bg-white rounded-2xl border border-slate-200 p-6">
+            <span className="material-symbols-outlined text-[48px] text-slate-300 mb-2">
+              inventory_2
+            </span>
+            <p className="font-bold text-slate-800 text-sm">No items found</p>
+            <p className="text-xs text-slate-500 mt-1">
+              Try changing the search or category filter.
+            </p>
           </div>
-        ))}
+        ) : (
+          filteredItems.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/90 flex flex-col justify-between gap-3 hover:border-emerald-600/50 transition-all"
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-100">
+                    <span className="material-symbols-outlined text-[22px]">
+                      {item.icon || 'shopping_bag'}
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-sm leading-snug">
+                      {item.name}
+                    </h4>
+                    {item.nameArabic && (
+                      <span className="text-xs text-slate-500 block font-medium">
+                        {item.nameArabic}
+                      </span>
+                    )}
+                    <span className="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full inline-block mt-1 font-medium">
+                      {item.category} • {item.unit || 'pcs'}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => openEdit(item)}
+                  className="text-slate-400 hover:text-emerald-700 p-1 transition-colors cursor-pointer"
+                  title="Edit Price/Stock"
+                >
+                  <span className="material-symbols-outlined text-[18px]">
+                    edit
+                  </span>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                <div>
+                  <span className="text-[10px] text-slate-400 block uppercase font-bold">
+                    Unit Price
+                  </span>
+                  <span className="font-bold text-emerald-700 text-base">
+                    AED {Number(item.price || 0).toFixed(2)}
+                  </span>
+                </div>
+
+                {onAddToCart ? (
+                  <button
+                    onClick={() => onAddToCart(item)}
+                    className="bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-xs flex items-center gap-1 active:scale-95 transition-transform cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      add_shopping_cart
+                    </span>
+                    + Add to Bill
+                  </button>
+                ) : (
+                  <span className="text-xs text-slate-500 font-medium bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+                    Stock: {item.stockQty ?? 0} {item.unit || 'pcs'}
+                  </span>
+                )}
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Add / Edit Product Modal */}
@@ -259,7 +272,7 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[20px]">
                   close
@@ -385,13 +398,13 @@ export const InventoryScreen: React.FC<InventoryScreenProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-sm transition-colors"
+                className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-sm transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 font-bold text-sm shadow-md transition-colors"
+                className="flex-1 py-3 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 font-bold text-sm shadow-md transition-colors cursor-pointer"
               >
                 Save Product
               </button>
