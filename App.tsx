@@ -14,20 +14,20 @@ import {
   INITIAL_EMPLOYEES,
   INITIAL_GROCERY_ITEMS,
   INITIAL_TRANSACTIONS,
-} from './initialData';
-import { Header } from './Header';
-import { BottomNav } from './BottomNav';
-import { AdminDashboardScreen } from './AdminDashboardScreen';
-import { PosBillingScreen } from './PosBillingScreen';
-import { InventoryScreen } from './InventoryScreen';
-import { CustomersScreen } from './CustomersScreen';
-import { VatReportScreen } from './VatReportScreen';
-import { ReceiptScannerModal } from './ReceiptScannerModal';
-import { LedgerScreen } from './LedgerScreen';
-import { SettingsScreen } from './SettingsScreen';
-import { TaxInvoiceModal } from './TaxInvoiceModal';
-import { EmployeesScreen } from './EmployeesScreen';
-import { RegisterShiftScreen } from './RegisterShiftScreen';
+} from './data/initialData';
+import { Header } from './components/Header';
+import { BottomNav } from './components/BottomNav';
+import { AdminDashboardScreen } from './components/AdminDashboardScreen';
+import { PosBillingScreen } from './components/PosBillingScreen';
+import { InventoryScreen } from './components/InventoryScreen';
+import { CustomersScreen } from './components/CustomersScreen';
+import { VatReportScreen } from './components/VatReportScreen';
+import { ReceiptScannerModal } from './components/ReceiptScannerModal';
+import { LedgerScreen } from './components/LedgerScreen';
+import { SettingsScreen } from './components/SettingsScreen';
+import { TaxInvoiceModal } from './components/TaxInvoiceModal';
+import { EmployeesScreen } from './components/EmployeesScreen';
+import { RegisterShiftScreen } from './components/RegisterShiftScreen';
 
 export default function App() {
   // User Role State
@@ -233,35 +233,22 @@ export default function App() {
   };
 
   // Add grocery item
-const handleAddGroceryItem = async (newItem: Omit<GroceryItem, 'id'>) => {
-  try {
-    const response = await fetch('/api/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: newItem.name,
-        sku: newItem.barcode || `SKU-${Date.now()}`,
-        category: newItem.category,
-        cost_price: 0,
-        selling_price: Number(newItem.price || 0),
-        stock_qty: Number(newItem.stockQty || 0),
-      }),
-    });
+  const handleAddGroceryItem = (newItem: Omit<GroceryItem, 'id'>) => {
+    const created: GroceryItem = {
+      ...newItem,
+      id: `item-${Date.now()}`,
+    };
+    setItems((prev) => [created, ...prev]);
+    showToast(`Added item "${created.name}"`);
+  };
 
-    if (!response.ok) {
-      throw new Error('Failed to save product');
-    }
-
-    const savedProduct = await response.json();
-
-    setItems((prev) => [savedProduct, ...prev]);
-
-    showToast(`Added item "${savedProduct.name}"`);
-  } catch (error) {
-    console.error(error);
-    showToast('Failed to save product');
-  }
-};
+  // Update grocery item
+  const handleUpdateGroceryItem = (id: string, updated: Partial<GroceryItem>) => {
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, ...updated } : item))
+    );
+    showToast('Item updated successfully');
+  };
 
   // Add Employee
   const handleAddEmployee = (
